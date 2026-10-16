@@ -67,6 +67,7 @@ class CfdCaseWriterFoam:
         self.porous_zone_objs = CfdTools.getPorousZoneObjects(analysis_obj)
         self.initialisation_zone_objs = CfdTools.getInitialisationZoneObjects(analysis_obj)
         self.zone_objs = CfdTools.getZoneObjects(analysis_obj)
+        self.mrf_zone_objs = CfdTools.getMRFZoneObjects(analysis_obj)
         self.dynamic_mesh_refinement_obj = CfdTools.getDynamicMeshAdaptation(self.mesh_obj)
         self.mesh_generated = False
         self.working_dir = CfdTools.getOutputPath(self.analysis_obj)
@@ -136,6 +137,10 @@ class CfdCaseWriterFoam:
             'initialisationZonesPresent': len(self.initialisation_zone_objs) > 0,
             'zones': {o.Label: {'PartNameList': tuple(r[0].Name for r in o.ShapeRefs)} for o in self.zone_objs},
             'zonesPresent': len(self.zone_objs) > 0,
+            # MRF extension ---------------------------------------------------
+            'mrfZones': {},
+            'mrfZonesPresent': False,
+            # -----------------------------------------------------------------
             'meshType': self.mesh_obj.Proxy.Type,
             'meshDimension': self.mesh_obj.ElementDimension,
             'meshDir': os.path.relpath(os.path.join(self.working_dir, self.mesh_obj.CaseName), self.case_folder),
@@ -187,6 +192,10 @@ class CfdCaseWriterFoam:
             self.exportMeanVelocityForceCellZoneStlSurfaces()
             self.processMeanVelocityForceCellZoneProperties()
 
+        if self.mrf_zone_objs:
+            cfdMessage('MRF zone(s) present\n')
+            self.processMRFZoneProperties()
+
         if self.reporting_functions:
             cfdMessage('Reporting functions present\n')
             self.processReportingFunctions()
@@ -207,6 +216,12 @@ class CfdCaseWriterFoam:
         self.setupPatchNames()
 
         TemplateBuilder(self.case_folder, self.template_path, self.settings)
+
+        # MRF extension: apply templates from extensions/mrf/templates/ if any MRF zones present
+        if self.mrf_zone_objs:
+            mrf_template_path = os.path.join(CfdTools.getModulePath(),
+                                             "extensions", "mrf", "templates")
+            TemplateBuilder(self.case_folder, mrf_template_path, self.settings)
 
         # Update Allrun permission - will fail silently on Windows
         file_name = os.path.join(self.case_folder, "Allrun")
@@ -777,9 +792,45 @@ class CfdCaseWriterFoam:
             settings['zones'][o.Label] = {'PartNameList': part_name_list}
         settings['zonesPresent'] = True
 
+    def processMRFZoneProperties(self):
+        """
+        Populate self.settings with data for each CfdMRFZone object.
+
+        For each zone the template (extensions/mrf/templates/MRFProperties)
+        expects the following keys under mrfZones/<label>/:
+            RotationOriginX/Y/Z  — rotation axis origin in metres (converted from mm)
+            RotationAxisX/Y/Z    — axis unit vector (dimensionless)
+            OmegaRadS            — angular velocity in rad/s (converted from RPM)
+            NonRotatingPatches   — raw string (may be empty)
+        """
+        import math
+        settings = self.settings
+        settings['mrfZonesPresent'] = True
+        for mrf in self.mrf_zone_objs:
+            # Origin: FreeCAD stores in mm → convert to m for OpenFOAM
+            ox = mrf.RotationOrigin.x / 1000.0
+            oy = mrf.RotationOrigin.y / 1000.0
+            oz = mrf.RotationOrigin.z / 1000.0
+            # Angular velocity: RPM → rad/s
+            omega = mrf.RPM * 2.0 * math.pi / 60.0
+            settings['mrfZones'][mrf.Label] = {
+                'RotationOriginX': ox,
+                'RotationOriginY': oy,
+                'RotationOriginZ': oz,
+                'RotationAxisX':   mrf.RotationAxis.x,
+                'RotationAxisY':   mrf.RotationAxis.y,
+                'RotationAxisZ':   mrf.RotationAxis.z,
+                'OmegaRadS':       omega,
+                'NonRotatingPatches': mrf.NonRotatingPatches,
+            }
+            # Register zone for topoSetZonesDict (same pattern as MeanVelocityForce)
+            part_name_list = tuple(r[0].Name for r in mrf.ShapeRefs)
+            settings['zones'][mrf.Label] = {'PartNameList': part_name_list}
+        settings['zonesPresent'] = True
+
     def processInitialisationZoneProperties(self):
         settings = self.settings
-        
+
         for zone_name in settings['initialisationZones']:
             z = settings['initialisationZones'][zone_name]
 

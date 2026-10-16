@@ -68,6 +68,8 @@ class CfdOFWorkbench(Workbench):
         import CfdOF.PostProcess.CfdReportingFunction
         import CfdOF.Solve.CfdScalarTransportFunction
         import CfdOF.Solve.CfdMeanVelocityForce
+        # MRF extension
+        from extensions.mrf import CfdMRFZone  # registers CfdOF_MRFZone command
         import CfdOF.CfdOpenPreferencesPage
         import CfdOF.CfdReloadWorkbench
         import CfdOF.CfdTestCommands
@@ -110,6 +112,7 @@ class CfdOFWorkbench(Workbench):
                   'CfdOF_PhysicsModel', 'CfdOF_FluidMaterial',
                   'CfdOF_FluidBoundary', 'CfdOF_InitialiseInternal',
                   'CfdOF_InitialisationZone', 'CfdOF_PorousZone', 'CfdOF_MeanVelocityForce',
+                  'CfdOF_MRFZone',
                   'CfdOF_ReportingFunctions', 'CfdOF_ScalarTransportFunctions',
                   'CfdOF_SolverControl',
                   ('M', 'CfdOF_OpenPreferences',),

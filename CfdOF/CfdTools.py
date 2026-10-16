@@ -249,6 +249,12 @@ def getMeanVelocityForceObjects(analysis_object):
     return getModelsOfType(analysis_object, 'CfdMeanVelocityForce')
 
 
+# MRF extension
+def getMRFZoneObjects(analysis_object):
+    """Return all CfdMRFZone objects belonging to the analysis."""
+    return getModelsOfType(analysis_object, 'CfdMRFZone')
+
+
 # Mesh
 def getMeshRefinementObjs(mesh_obj):
     return getModelsOfType(mesh_obj, 'CfdMeshRefinement')

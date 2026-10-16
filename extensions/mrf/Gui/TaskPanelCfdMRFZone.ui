@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TaskPanelCfdMRFZone</class>
+ <widget class="QWidget" name="TaskPanelCfdMRFZone">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBoxZone">
+     <property name="title">
+      <string>MRF Zone</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+
+      <!-- Row 0: solid selection widget (populated at runtime by CfdFaceSelectWidget) -->
+      <item row="0" column="0" colspan="4">
+       <widget class="QWidget" name="faceSelectWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Row 1: Rotation origin -->
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelOrigin">
+        <property name="text">
+         <string>Rotation origin (X, Y, Z)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="Gui::InputField" name="inputOriginX">
+        <property name="unit" stdset="0">
+         <string notr="true">mm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="Gui::InputField" name="inputOriginY">
+        <property name="unit" stdset="0">
+         <string notr="true">mm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="Gui::InputField" name="inputOriginZ">
+        <property name="unit" stdset="0">
+         <string notr="true">mm</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Row 2: Rotation axis -->
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelAxis">
+        <property name="text">
+         <string>Rotation axis (X, Y, Z)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="Gui::InputField" name="inputAxisX">
+        <property name="unit" stdset="0">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="Gui::InputField" name="inputAxisY">
+        <property name="unit" stdset="0">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="Gui::InputField" name="inputAxisZ">
+        <property name="unit" stdset="0">
+         <string notr="true">1</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Row 3: RPM -->
+      <item row="3" column="0">
+       <widget class="QLabel" name="labelRPM">
+        <property name="text">
+         <string>Rotational speed (RPM)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="3">
+       <widget class="Gui::InputField" name="inputRPM">
+        <property name="unit" stdset="0">
+         <string notr="true">1/min</string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- Row 4: Non-rotating patches -->
+      <item row="4" column="0">
+       <widget class="QLabel" name="labelNonRotatingPatches">
+        <property name="text">
+         <string>Non-rotating patches</string>
+        </property>
+        <property name="toolTip">
+         <string>Comma-separated list of patch names inside the MRF zone that must remain stationary (e.g. a shaft). Leave empty if not needed.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="3">
+       <widget class="QLineEdit" name="inputNonRotatingPatches">
+        <property name="placeholderText">
+         <string>e.g. shaft, hub  (comma-separated, leave empty if none)</string>
+        </property>
+       </widget>
+      </item>
+
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Gui::InputField</class>
+   <extends>QLineEdit</extends>
+   <header>Gui/InputField.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
